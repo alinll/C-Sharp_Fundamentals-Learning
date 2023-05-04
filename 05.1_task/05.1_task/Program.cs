@@ -1,6 +1,6 @@
 ﻿namespace _05._1_task
 {
-
+    //1
     interface IFlyable
     {
         void Fly()
@@ -9,6 +9,7 @@
         }
     }
 
+    //2
     class Bird : IFlyable
     {
         public string Name { get; set; }
@@ -57,6 +58,7 @@
                 HighFly = 11000
             };
 
+            //3
             IFlyable[] flyingObject = new IFlyable[]
             {
                 bird1,
