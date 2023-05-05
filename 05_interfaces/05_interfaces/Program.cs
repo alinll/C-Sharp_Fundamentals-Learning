@@ -87,6 +87,7 @@
 
             developers = programmers.Cast<IDeveloper>().Concat(builders.Cast<IDeveloper>()).ToList();
 
+            Console.WriteLine("Sorted list of developers:");
             foreach (IDeveloper dev in developers)
             {
                 Console.WriteLine(dev);
