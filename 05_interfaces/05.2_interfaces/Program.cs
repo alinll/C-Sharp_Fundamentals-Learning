@@ -33,11 +33,11 @@
             uint searchedId = uint.Parse(Console.ReadLine());
             if (dictionary.ContainsKey(searchedId))
             {
-                    Console.WriteLine(dictionary[searchedId]);
+                Console.WriteLine(dictionary[searchedId]);
             }
             else
             {
-                    Console.WriteLine("Such ID isn't in the list");
+                Console.WriteLine("Such ID isn't in the list");
             }
         }
     }

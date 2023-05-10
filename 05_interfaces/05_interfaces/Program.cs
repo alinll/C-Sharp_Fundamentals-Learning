@@ -1,7 +1,7 @@
 ﻿namespace _05_interfaces
 {
     //1
-    interface IDeveloper
+    interface IDeveloper: IComparable<IDeveloper>
     {
         string Tool { get; set; }
         void Create();
@@ -9,14 +9,14 @@
     }
 
     //2
-    class Programmer : IDeveloper, IComparable<Programmer>
+    class Programmer : IDeveloper
     {
         public string Language { get; set; }
         public string Tool { get; set; }
 
-        public int CompareTo(Programmer? other)
+        public int CompareTo(IDeveloper? other)
         {
-            return this.Language.CompareTo(other.Language);
+            return string.Compare(Tool, other.Tool);
         }
 
         public void Create()
@@ -34,14 +34,14 @@
         }
     }
 
-    class Builder : IDeveloper, IComparable<Builder>
+    class Builder : IDeveloper
     {
         public string DestroingTool { get; set; }
         public string Tool { get; set; }
 
-        public int CompareTo(Builder? other)
+        public int CompareTo(IDeveloper? other)
         {
-            return this.Tool.CompareTo(other.Tool);
+            return string.Compare(Tool, other.Tool);
         }
 
         public void Create()
@@ -79,13 +79,7 @@
             }
 
             //4
-            List<Programmer> programmers = developers.OfType<Programmer>().ToList();
-            programmers.Sort();
-
-            List<Builder> builders = developers.OfType<Builder>().ToList();
-            builders.Sort();
-
-            developers = programmers.Cast<IDeveloper>().Concat(builders.Cast<IDeveloper>()).ToList();
+            developers.Sort();
 
             Console.WriteLine("Sorted list of developers:");
             foreach (IDeveloper dev in developers)
