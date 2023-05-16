@@ -89,7 +89,7 @@
         }
 
         //3
-        string directoryPath = @"C:\Users\Aser\OneDrive\Робочий стіл\test";
+        string directoryPath = @"D:\\test";
 
         try
         {
