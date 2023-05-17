@@ -38,7 +38,7 @@
 
             if (!File.Exists(copyPhonesPath))
             {
-                File.Create(copyPhonesPath);
+                File.Create(copyPhonesPath).Close();
             }
 
              using (StreamWriter writer = File.CreateText(copyPhonesPath))
@@ -77,7 +77,7 @@
 
             if (!File.Exists(newFilePath))
             {
-                File.Create(newFilePath);
+                File.Create(newFilePath).Close();
             }
 
             using(StreamWriter newWriter = File.CreateText(newFilePath))
