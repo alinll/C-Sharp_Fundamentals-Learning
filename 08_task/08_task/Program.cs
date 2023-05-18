@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace _08_task
+﻿namespace _08_task
 {
     internal class Program
     {
