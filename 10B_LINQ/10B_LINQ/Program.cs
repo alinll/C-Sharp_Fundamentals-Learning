@@ -1,6 +1,4 @@
-﻿using System.Text.RegularExpressions;
-
-namespace _10B_LINQ
+﻿namespace _10B_LINQ
 {
     internal class Program
     {
