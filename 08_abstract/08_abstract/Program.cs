@@ -1,6 +1,5 @@
 ﻿namespace _08_abstract
 {
-    //1
     abstract public class Shape : IComparable<Shape>
     {
         private string name;
@@ -81,9 +80,9 @@
     {
         static void Main(string[] args)
         {
-            //a
+            //1
             List<Shape> shapes = new List<Shape>();
-            int size = 10;
+            int size = 6;
 
             for (int i = 0; i < size; i++)
             {
@@ -142,8 +141,55 @@
                 Console.WriteLine();
             }
 
-            //b
-            Shape shapeWithLargestPerimeter = GetShapeWithLargestPerimeter(shapes);
+            //2
+            var rangeArea = shapes.Where(s => (s.Area() >= 10 && s.Area() <= 100));
+
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            string fileName = "shapes.txt";
+            string filePath = Path.Combine(path, fileName);
+
+            if (!File.Exists(filePath))
+            {
+                File.Create(filePath).Close();
+            }
+
+            using (StreamWriter writer = File.CreateText(filePath))
+            {
+                writer.WriteLine($"Shapes with area from range 10 to 100:");
+                foreach(Shape s in rangeArea)
+                {
+                    writer.WriteLine($"{s.Name} with area {s.Area()}cm");
+                }
+            }
+
+            //3
+            var shapesWithA = shapes.Where(s => s.Name.Contains('a'));
+
+            using (StreamWriter writer = File.AppendText(filePath))
+            {
+                writer.WriteLine($"\nShapes with letter 'a':");
+                foreach (Shape s in shapesWithA)
+                {
+                    writer.WriteLine($"{s.Name} with area {s.Area()}cm and perimeter {s.Perimeter()}");
+                }
+            }
+
+            using (StreamReader reader = File.OpenText(filePath))
+            {
+                string fileShapes = reader.ReadToEnd();
+                Console.WriteLine(fileShapes);
+            }
+
+            //4
+            shapes.RemoveAll(s => s.Perimeter() < 5);
+
+            Console.WriteLine("Shapes with perimeter more than 5cm:");
+            foreach(Shape s in shapes)
+            {
+                Console.WriteLine($"{s.Name} with perimeter {s.Perimeter()}cm");
+            }
+
+            /*Shape shapeWithLargestPerimeter = GetShapeWithLargestPerimeter(shapes);
 
             static Shape GetShapeWithLargestPerimeter(List<Shape> shapes)
             {
@@ -163,13 +209,12 @@
                 return largestPerimeterShape;
             }
 
-            //3
             shapes.Sort();
             Console.WriteLine("\nSorted list:");
             foreach (Shape s in shapes)
             {
                 s.Show();
-            }
+            }*/
         }
     }
 }
