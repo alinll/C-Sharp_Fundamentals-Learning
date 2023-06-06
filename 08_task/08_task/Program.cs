@@ -1,44 +1,46 @@
-﻿namespace _08_task
+﻿using System.Runtime.Serialization.Formatters.Binary;
+using System.Text.Json;
+using System.Xml.Serialization;
+
+namespace _08_task
 {
-    internal class Program
-    {
-        //1
-        public class Person
+    [Serializable]
+    public class Person
         {
-            private string name;
+            public string Name { get; set; }
+            public Person() { }
             public Person(string name)
             {
-                this.name = name;
+                this.Name = name;
             }
-            public string Name { get { return name; } }
 
-            public virtual void Print()
+            public override string ToString()
             {
-                Console.WriteLine("Name: {0}", this.name);
+                return $"Name: {Name}";
             }
 
-            //4
             public void Search(string searchName)
             {
                 if (searchName == this.Name)
                 {
-                    Print();
+                    ToString();
                 }
             }
         }
 
-        public class Staff : Person, IComparable<Staff>
+    [Serializable]
+    public class Staff : Person, IComparable<Staff>
         {
-            private int salary;
-            public int Salary { get { return salary; } }
+            public int Salary { get; set; }
+            public Staff() { }
             public Staff(string name, int salary) : base(name)
             {
-                this.salary = salary;
+                this.Salary = salary;
             }
 
-            public override void Print()
+            public override string ToString()
             {
-                Console.WriteLine("Person {0} has salary: ${1}", Name, this.salary);
+                return $"Person {Name} has salary: ${Salary}";
             }
 
             int IComparable<Staff>.CompareTo(Staff? other)
@@ -47,67 +49,126 @@
             }
         }
 
-        //2
-        public class Teacher : Staff
+    [Serializable]
+    public class Teacher : Staff
         {
-            private string subject;
-            public string Subject { get { return subject; } }
+            public Teacher() { }
+            public string Subject { get; set; }
             public Teacher(string name, int salary, string subject) : base(name, salary)
             {
-                this.subject = subject;
+                this.Subject = subject;
             }
 
-            public override void Print()
+            public override string ToString()
             {
-                Console.WriteLine($"Teacher {Name} teachs {this.subject} and has salary ${Salary}");
+                return $"Teacher {Name} teachs {Subject} and has salary ${Salary}";
             }
         }
 
-        public class Developer : Staff
+    [Serializable]
+    public class Developer : Staff
         {
-            private string level;
-            public string Level { get { return level; } }
+            public string Level { get; set; }
+            public Developer() { }
             public Developer(string name, int salary, string level) : base(name, salary)
             {
-                this.level = level;
+                this.Level = level;
             }
 
-            public override void Print()
+            public override string ToString()
             {
-                Console.WriteLine($"Developer {Name} with level {this.level} has salary ${Salary}");
+                return $"Developer {Name} with level {Level} has salary ${Salary}";
             }
         }
+    internal class Program
+    {
+        
         static void Main(string[] args)
         {
             Person person1 = new Person("Oleg");
-            person1.Print();
+            //person1.Print();
 
             Staff staff1 = new Staff("Igor", 200);
-            staff1.Print();
+            //staff1.Print();
 
             person1 = new Staff("Ira", 300);
-            person1.Print();
+            //person1.Print();
 
-            //3
+            Teacher teacher = new Teacher("Andriy", 460, "OOP");
+
             List<Person> persons = new List<Person>
             {
                 new Person("Nadya"),
                 person1,
                 staff1,
-                new Teacher("Andriy", 460, "OOP"),
+                teacher,
                 new Teacher("Khrystyna", 280, "DB"),
                 new Developer("Vlad", 2000, "Middle"),
                 new Developer("Serhiy", 1300, "Junior")
                 
             };
 
-            Console.WriteLine("\nList of persons");
-            foreach(Person p in persons)
+            List<Teacher> teachers = new List<Teacher>
+            {
+                new Teacher("Andriy", 460, "OOP"),
+                new Teacher("Khrystyna", 280, "DB")
+
+            };
+
+            File.WriteAllText("persons.json", JsonSerializer.Serialize(persons));
+            File.WriteAllText("teachers.json", JsonSerializer.Serialize(teachers));
+
+
+            string jsonRead = File.ReadAllText("persons.json");
+            List<Person>? personRead = JsonSerializer.Deserialize<List<Person>>(jsonRead);
+
+            Console.WriteLine("Persons from JSON:");
+            foreach(Person p in personRead)
+            {
+                Console.WriteLine(p.ToString());
+            }
+
+            jsonRead = File.ReadAllText("teachers.json");
+            List<Teacher>? teacherRead = JsonSerializer.Deserialize<List<Teacher>>(jsonRead);
+
+            Console.WriteLine("\nTeachers from JSON:");
+            foreach (Teacher t in teacherRead)
+            {
+                Console.WriteLine(t.ToString());
+            }
+
+            XmlSerializer xml = new XmlSerializer(typeof(Teacher));
+
+            using (FileStream fs = File.Create("teacher.xml"))
+            {
+                xml.Serialize(fs, teacher);
+            }
+
+            Teacher? teacherxml = null;
+
+            using (FileStream fs = File.OpenRead("teacher.xml"))
+            {
+                teacherxml = xml.Deserialize(fs) as Teacher;
+            }
+
+            Console.WriteLine("\nTeacher from XML:");
+            Console.WriteLine(teacher.ToString());
+
+            BinaryFormatter binary = new BinaryFormatter();
+            using (FileStream fs = File.Create("persons.bin"))
+            {
+                //in net7.0 exception: 'BinaryFormatter serialization is obsolete and should not be used.
+                //See https://aka.ms/binaryformatter for more information.'
+
+                //binary.Serialize(fs, persons);
+            }
+
+            /*Console.WriteLine("\nList of persons");
+            foreach (Person p in persons)
             {
                 p.Print();
             }
 
-            //4
             Console.Write("\nEnter name for searching information: ");
             string searchName = Console.ReadLine();
             foreach (Person p in persons)
@@ -115,7 +176,6 @@
                 p.Search(searchName);
             }
 
-            //5
             persons = persons.OrderBy(person => person.Name).ToList();
 
             string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
@@ -127,7 +187,7 @@
                 File.Create(filePath).Close();
             }
 
-            using(StreamWriter writer = File.CreateText(filePath))
+            using (StreamWriter writer = File.CreateText(filePath))
             {
                 foreach (Person p in persons)
                 {
@@ -135,18 +195,17 @@
                 }
             }
 
-            using(StreamReader reader = File.OpenText(filePath))
+            using (StreamReader reader = File.OpenText(filePath))
             {
                 string allContent = reader.ReadToEnd();
                 Console.WriteLine($"\nSorted persons:\n{allContent}");
             }
 
-            //6
             List<Staff> employees = new List<Staff>();
 
-            foreach(Person p in persons)
+            foreach (Person p in persons)
             {
-                if(p is Teacher || p is Developer)
+                if (p is Teacher || p is Developer)
                 {
                     employees.Add((Staff)p);
                 }
@@ -155,10 +214,10 @@
             employees.Sort();
 
             Console.WriteLine("List of sorted salaries:");
-            foreach(Staff e in employees)
+            foreach (Staff e in employees)
             {
                 e.Print();
-            }
+            }*/
         }
     }
 }
